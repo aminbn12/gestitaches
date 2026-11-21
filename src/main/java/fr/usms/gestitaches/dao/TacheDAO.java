@@ -113,6 +113,24 @@ public class TacheDAO {
         }
     }
 
+    /**
+     * Met à jour le statut d'une tâche.
+     *
+     * @param tacheId identifiant de la tâche
+     * @param statut nouveau statut ({@code A_FAIRE}, {@code EN_COURS} ou {@code TERMINEE})
+     */
+    public void changerStatut(int tacheId, String statut) {
+        String sql = "UPDATE tache SET statut = ? WHERE id = ?";
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement requete = connexion.prepareStatement(sql)) {
+            requete.setString(1, statut);
+            requete.setInt(2, tacheId);
+            requete.executeUpdate();
+        } catch (SQLException e) {
+            throw new PersistanceException("Impossible de modifier le statut de la tâche.", e);
+        }
+    }
+
     private Tache construireTache(ResultSet resultats) throws SQLException {
         int idUtilisateur = resultats.getInt("utilisateur_id");
         Integer utilisateurId = resultats.wasNull() ? null : idUtilisateur;

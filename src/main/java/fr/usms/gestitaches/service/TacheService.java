@@ -6,6 +6,7 @@ import fr.usms.gestitaches.model.Tache;
 import fr.usms.gestitaches.model.Utilisateur;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service métier gérant les opérations sur les tâches.
@@ -13,6 +14,7 @@ import java.util.List;
 public class TacheService {
 
     private static final String STATUT_INITIAL = "A_FAIRE";
+    private static final Set<String> STATUTS_AUTORISES = Set.of("A_FAIRE", "EN_COURS", "TERMINEE");
 
     private final TacheDAO tacheDAO;
     private final UtilisateurDAO utilisateurDAO;
@@ -85,6 +87,22 @@ public class TacheService {
             throw new IllegalArgumentException("Le membre sélectionné n'existe pas.");
         }
         tacheDAO.assignerUtilisateur(tacheId, utilisateurId);
+    }
+
+    /**
+     * Modifie le statut d'une tâche parmi {@code A_FAIRE}, {@code EN_COURS} et {@code TERMINEE}.
+     *
+     * @param tacheId identifiant de la tâche
+     * @param nouveauStatut nouveau statut souhaité
+     */
+    public void changerStatut(int tacheId, String nouveauStatut) {
+        if (tacheId <= 0 || tacheDAO.trouverParId(tacheId) == null) {
+            throw new IllegalArgumentException("La tâche sélectionnée n'existe pas.");
+        }
+        if (nouveauStatut == null || !STATUTS_AUTORISES.contains(nouveauStatut)) {
+            throw new IllegalArgumentException("Statut invalide : valeurs autorisées A_FAIRE, EN_COURS, TERMINEE.");
+        }
+        tacheDAO.changerStatut(tacheId, nouveauStatut);
     }
 
     private String normaliserChampFacultatif(String valeur) {

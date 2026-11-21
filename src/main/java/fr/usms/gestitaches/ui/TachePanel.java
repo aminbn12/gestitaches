@@ -42,6 +42,7 @@ public class TachePanel extends JPanel {
     private final JTextField champEcheance;
     private final JLabel etiquetteProjetSelectionne;
     private final JComboBox<Utilisateur> comboMembres;
+    private final JComboBox<String> comboStatuts;
     private final Map<Integer, String> nomsMembresParId;
     private Projet projetSelectionne;
 
@@ -54,6 +55,7 @@ public class TachePanel extends JPanel {
         this.champEcheance = new JTextField(12);
         this.etiquetteProjetSelectionne = new JLabel("Aucun projet sélectionné");
         this.comboMembres = new JComboBox<>();
+        this.comboStatuts = new JComboBox<>(new String[]{"A_FAIRE", "EN_COURS", "TERMINEE"});
         this.nomsMembresParId = new HashMap<>();
 
         initialiserInterface();
@@ -133,12 +135,18 @@ public class TachePanel extends JPanel {
         JScrollPane scrollListe = new JScrollPane(listeTaches);
 
         JPanel panneauActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
-        panneauActions.setBorder(BorderFactory.createTitledBorder("Attribuer la tâche sélectionnée"));
+        panneauActions.setBorder(BorderFactory.createTitledBorder("Actions sur la tâche sélectionnée"));
         panneauActions.add(new JLabel("Membre :"));
         panneauActions.add(comboMembres);
         JButton boutonAssigner = new JButton("Assigner");
         boutonAssigner.addActionListener(e -> actionAssignerTache());
         panneauActions.add(boutonAssigner);
+
+        panneauActions.add(new JLabel("Statut :"));
+        panneauActions.add(comboStatuts);
+        JButton boutonStatut = new JButton("Changer statut");
+        boutonStatut.addActionListener(e -> actionChangerStatut());
+        panneauActions.add(boutonStatut);
 
         add(panneauFormulaire, BorderLayout.NORTH);
         add(scrollListe, BorderLayout.CENTER);
@@ -234,6 +242,31 @@ public class TachePanel extends JPanel {
         }
         try {
             tacheService.assignerTache(tacheSelectionnee.getId(), membreSelectionne.getId());
+            chargerTaches();
+        } catch (IllegalArgumentException | PersistanceException ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void actionChangerStatut() {
+        Tache tacheSelectionnee = listeTaches.getSelectedValue();
+        if (tacheSelectionnee == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Veuillez sélectionner une tâche pour changer son statut.",
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+        String nouveauStatut = (String) comboStatuts.getSelectedItem();
+        try {
+            tacheService.changerStatut(tacheSelectionnee.getId(), nouveauStatut);
             chargerTaches();
         } catch (IllegalArgumentException | PersistanceException ex) {
             JOptionPane.showMessageDialog(

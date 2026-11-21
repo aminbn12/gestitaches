@@ -49,9 +49,24 @@
 - **Fichiers autorisés (Étape 4)** : `model/Utilisateur.java`, `dao/UtilisateurDAO.java`, `dao/TacheDAO.java`, `service/TacheService.java`, `ui/TachePanel.java`.
 - **Analyse du diff (`--stat`) (Étape 6)** : 5 fichiers Java dans le périmètre autorisé + `docs/journal-atelier.md`. Couches respectées (`java.sql` uniquement dans `dao`, `javax.swing` uniquement dans `ui`), `PreparedStatement`, `try-with-resources`, `PersistanceException`, aucune fonctionnalité en trop.
 - **Décision / consigne de correction (Étape 7)** : Proposition acceptée sans correction.
-- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels en attente de validation.
-- **Commit (Étape 9)** : à compléter après tests et commit
+- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels validés (assignation à un membre, réassignation à un autre membre, refus si aucune tâche sélectionnée, vérification SQL avec `LEFT JOIN`).
+- **Commit (Étape 9)** : `US3 : assigner une tâche à un membre`
 
 ## User story 4 — Changer le statut d'une tâche
+
+- **Scénarios d'acceptation (Étape 2)** :
+
+| Scénario | Étant donné / Quand | Alors (résultat attendu) |
+| :--- | :--- | :--- |
+| Cas nominal | Une tâche existe ; je sélectionne la tâche, choisis un nouveau statut (`EN_COURS` ou `TERMINEE` ou `A_FAIRE`) et clique sur « Changer statut » | Le nouveau statut s'affiche immédiatement sur la tâche et est enregistré en base |
+| Cas limite : statut invalide | Appel au service avec un statut hors `{A_FAIRE, EN_COURS, TERMINEE}` (ou `null`/vide) | Le changement est refusé (`IllegalArgumentException`), aucune modification en base |
+| Cas limite : aucune tâche sélectionnée | Aucune tâche sélectionnée dans la liste, clic sur « Changer statut » | Un message d'erreur s'affiche |
+
+- **Verdict sur le plan (Étape 3)** : Plan validé (couches `dao`, `service`, `ui` respectées, US4 uniquement).
+- **Fichiers autorisés (Étape 4)** : `dao/TacheDAO.java`, `service/TacheService.java`, `ui/TachePanel.java`.
+- **Analyse du diff (`--stat`) (Étape 6)** : 3 fichiers Java dans le périmètre autorisé + `docs/journal-atelier.md`. Couches respectées (`java.sql` uniquement dans `dao`, `javax.swing` uniquement dans `ui`), `PreparedStatement`, `try-with-resources`, `PersistanceException`, statuts limités à `A_FAIRE`, `EN_COURS`, `TERMINEE`.
+- **Décision / consigne de correction (Étape 7)** : Proposition acceptée sans correction.
+- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels en attente de validation.
+- **Commit (Étape 9)** : à compléter après tests et commit
 
 ## User story 5 — Filtrer les tâches par statut ou par membre
