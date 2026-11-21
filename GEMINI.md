@@ -21,13 +21,17 @@ Elle permet de créer des projets, d'y ajouter des tâches, de les assigner, de 
 
 - Utiliser exclusivement des requêtes SQL paramétrées (`PreparedStatement`), jamais de concaténation de chaînes
 - Ne stocker aucun mot de passe, jeton ou clé secrète en dur dans le code source
+- Ressources JDBC ouvertes dans un `try-with-resources`.
+- Une `SQLException` est traduite en `PersistanceException`, jamais avalée (ni catch vide, ni `printStackTrace` seul).
 
 ## Façon de travailler
 
 - Toujours proposer un plan détaillé et attendre validation avant de créer ou modifier des fichiers
 - Implémenter une seule user story à la fois, en respectant strictement `spec.md` et `schema.sql`
+- Ne modifier que les fichiers listés dans ma demande. Si un autre fichier est nécessaire, s'arrêter et demander.
 
 ## Documents de référence
 
 - `spec.md` : user stories et critères d'acceptation
 - `schema.sql` : schéma de la base de données
+- `architecture.md` : couches et dépendances autorisées

@@ -15,8 +15,10 @@
 
 ## Règles métier, par user story
 
-- US1 : <à compléter>
-- US2 : <à compléter>
-- US3 : <à compléter>
-- US4 : <à compléter>
-- US5 : <à compléter>
+| User story | Règle métier principale | Couche et classe |
+| :--- | :--- | :--- |
+| 1. Créer un projet | Nom du projet obligatoire (non vide), description facultative | `service` (`ProjetService`) |
+| 2. Créer une tâche dans un projet | Titre obligatoire, projet existant obligatoire, statut initial `A_FAIRE`, échéance facultative | `service` (`TacheService`) |
+| 3. Assigner une tâche à un membre | Une tâche est assignée à un seul membre existant (ou reste non assignée) | `service` (`TacheService`) et `dao` (`UtilisateurDAO`, `TacheDAO`) |
+| 4. Changer le statut d'une tâche | Statut restreint aux valeurs `A_FAIRE`, `EN_COURS`, `TERMINEE` | `service` (`TacheService`) |
+| 5. Filtrer les tâches par statut ou par membre | Filtrage des tâches d'un projet par statut ou par membre via requête SQL paramétrée | `dao` (`TacheDAO`), appelé par `service` (`TacheService`) |
