@@ -2,6 +2,7 @@ package fr.usms.gestitaches;
 
 import fr.usms.gestitaches.dao.DatabaseConnection;
 import fr.usms.gestitaches.service.ProjetService;
+import fr.usms.gestitaches.service.TacheService;
 import fr.usms.gestitaches.ui.MainFrame;
 
 import javax.swing.SwingUtilities;
@@ -25,7 +26,8 @@ public class App {
 
         SwingUtilities.invokeLater(() -> {
             ProjetService projetService = new ProjetService();
-            MainFrame fenetre = new MainFrame(projetService);
+            TacheService tacheService = new TacheService();
+            MainFrame fenetre = new MainFrame(projetService, tacheService);
             fenetre.setVisible(true);
         });
     }

@@ -19,6 +19,22 @@
 
 ## User story 2 — Créer une tâche dans un projet
 
+- **Scénarios d'acceptation (Étape 2)** :
+
+| Scénario | Étant donné / Quand | Alors (résultat attendu) |
+| :--- | :--- | :--- |
+| Cas nominal (complet) | Un projet est sélectionné ; saisie d'un titre non vide, description et échéance, clic sur « Ajouter la tâche » | La tâche apparaît dans la liste du projet avec le statut `A_FAIRE`, et est enregistrée en base (`projet_id` renseigné, `utilisateur_id` NULL) |
+| Cas nominal (minimal) | Un projet est sélectionné ; saisie d'un titre seul sans description ni échéance, clic sur « Ajouter la tâche » | La tâche est créée avec `statut = 'A_FAIRE'`, description et échéance NULL |
+| Cas limite : titre vide | Un projet est sélectionné ; titre vide ou espaces uniquement, clic sur « Ajouter la tâche » | Création refusée, message d'erreur affiché, aucune ligne ajoutée en base |
+| Cas limite : aucun projet sélectionné | Aucun projet sélectionné dans la liste, clic sur « Ajouter la tâche » | Création refusée, message d'erreur affiché |
+
+- **Verdict sur le plan (Étape 3)** : Plan validé (couches `model`, `dao`, `service`, `ui` respectées, US2 uniquement).
+- **Fichiers autorisés (Étape 4)** : `model/Tache.java`, `dao/TacheDAO.java`, `service/TacheService.java`, `ui/TachePanel.java`, `ui/MainFrame.java`, `App.java`.
+- **Analyse du diff (`--stat`) (Étape 6)** : 6 fichiers Java dans le périmètre autorisé + `docs/journal-atelier.md`. Couches respectées (`java.sql` uniquement dans `dao`, `javax.swing` uniquement dans `ui`), `PreparedStatement`, `try-with-resources`, `PersistanceException`, aucune fonctionnalité en trop.
+- **Décision / consigne de correction (Étape 7)** : Proposition acceptée sans correction.
+- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels en attente de validation.
+- **Commit (Étape 9)** : à compléter après tests et commit
+
 ## User story 3 — Assigner une tâche à un membre
 
 ## User story 4 — Changer le statut d'une tâche
