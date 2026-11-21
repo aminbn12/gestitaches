@@ -66,7 +66,23 @@
 - **Fichiers autorisés (Étape 4)** : `dao/TacheDAO.java`, `service/TacheService.java`, `ui/TachePanel.java`.
 - **Analyse du diff (`--stat`) (Étape 6)** : 3 fichiers Java dans le périmètre autorisé + `docs/journal-atelier.md`. Couches respectées (`java.sql` uniquement dans `dao`, `javax.swing` uniquement dans `ui`), `PreparedStatement`, `try-with-resources`, `PersistanceException`, statuts limités à `A_FAIRE`, `EN_COURS`, `TERMINEE`.
 - **Décision / consigne de correction (Étape 7)** : Proposition acceptée sans correction.
-- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels en attente de validation.
-- **Commit (Étape 9)** : à compléter après tests et commit
+- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels validés (changement vers `EN_COURS` / `TERMINEE`, refus si aucune tâche sélectionnée, vérification en base).
+- **Commit (Étape 9)** : `US4 : changer le statut d'une tâche`
 
 ## User story 5 — Filtrer les tâches par statut ou par membre
+
+- **Scénarios d'acceptation (Étape 2)** :
+
+| Scénario | Étant donné / Quand | Alors (résultat attendu) |
+| :--- | :--- | :--- |
+| Cas nominal (filtre par statut) | Un projet contient plusieurs tâches avec différents statuts ; je sélectionne un statut (ex. `EN_COURS`) et applique le filtre | Seules les tâches de ce projet ayant ce statut s'affichent (via requête SQL paramétrée) |
+| Cas nominal (filtre par membre) | Un projet contient des tâches assignées à différents membres ; je sélectionne un membre et applique le filtre | Seules les tâches de ce projet assignées à ce membre s'affichent |
+| Cas nominal (toutes les tâches) | Filtres sur « Tous » | Toutes les tâches du projet s'affichent |
+| Cas limite : aucun résultat | Un filtre ne correspond à aucune tâche du projet | La liste affichée est vide et un message informatif indique qu'aucune tâche ne correspond |
+
+- **Verdict sur le plan (Étape 3)** : Plan validé (filtrage SQL paramétré dans `TacheDAO`, pas de tri côté UI).
+- **Fichiers autorisés (Étape 4)** : `dao/TacheDAO.java`, `service/TacheService.java`, `ui/TachePanel.java`.
+- **Analyse du diff (`--stat`) (Étape 6)** : 3 fichiers Java dans le périmètre autorisé + `docs/journal-atelier.md`. Couches respectées (aucun `java.sql` hors `dao`, aucun `javax.swing` hors `ui`), `PreparedStatement`, `try-with-resources`, `PersistanceException`.
+- **Décision / consigne de correction (Étape 7)** : Proposition acceptée sans correction.
+- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels en attente de validation.
+- **Commit (Étape 9)** : `US5 : filtrer les tâches par statut ou par membre` (à committer après tests)

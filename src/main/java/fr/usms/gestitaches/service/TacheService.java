@@ -105,6 +105,27 @@ public class TacheService {
         tacheDAO.changerStatut(tacheId, nouveauStatut);
     }
 
+    /**
+     * Retourne les tâches d'un projet filtrées par statut et/ou par membre attribué.
+     *
+     * @param projetId identifiant du projet
+     * @param statut statut souhaité ou {@code null} pour tous
+     * @param utilisateurId identifiant du membre ou {@code null} pour tous
+     * @return liste des tâches filtrées
+     */
+    public List<Tache> filtrerTachesDuProjet(int projetId, String statut, Integer utilisateurId) {
+        if (projetId <= 0) {
+            throw new IllegalArgumentException("Veuillez sélectionner un projet valide.");
+        }
+        if (statut != null && !STATUTS_AUTORISES.contains(statut)) {
+            throw new IllegalArgumentException("Statut de filtre invalide : valeurs autorisées A_FAIRE, EN_COURS, TERMINEE.");
+        }
+        if (utilisateurId != null && utilisateurDAO.trouverParId(utilisateurId) == null) {
+            throw new IllegalArgumentException("Le membre de filtre sélectionné n'existe pas.");
+        }
+        return tacheDAO.listerParProjetEtFiltres(projetId, statut, utilisateurId);
+    }
+
     private String normaliserChampFacultatif(String valeur) {
         if (valeur == null || valeur.trim().isEmpty()) {
             return null;

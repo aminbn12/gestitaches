@@ -30,9 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Panneau Swing dédié à la création, à l'affichage et à l'attribution des tâches d'un projet.
+ * Panneau Swing dédié à la création, à l'affichage, à l'attribution, au statut et au filtrage des tâches d'un projet.
  */
 public class TachePanel extends JPanel {
+
+    private static final String OPTION_TOUS_STATUTS = "Tous";
 
     private final TacheService tacheService;
     private final DefaultListModel<Tache> modeleListeTaches;
@@ -41,8 +43,11 @@ public class TachePanel extends JPanel {
     private final JTextArea champDescription;
     private final JTextField champEcheance;
     private final JLabel etiquetteProjetSelectionne;
+    private final JLabel etiquetteMessageListe;
     private final JComboBox<Utilisateur> comboMembres;
     private final JComboBox<String> comboStatuts;
+    private final JComboBox<String> comboFiltreStatut;
+    private final JComboBox<Utilisateur> comboFiltreMembre;
     private final Map<Integer, String> nomsMembresParId;
     private Projet projetSelectionne;
 
@@ -54,8 +59,11 @@ public class TachePanel extends JPanel {
         this.champDescription = new JTextArea(2, 20);
         this.champEcheance = new JTextField(12);
         this.etiquetteProjetSelectionne = new JLabel("Aucun projet sélectionné");
+        this.etiquetteMessageListe = new JLabel(" ");
         this.comboMembres = new JComboBox<>();
         this.comboStatuts = new JComboBox<>(new String[]{"A_FAIRE", "EN_COURS", "TERMINEE"});
+        this.comboFiltreStatut = new JComboBox<>(new String[]{OPTION_TOUS_STATUTS, "A_FAIRE", "EN_COURS", "TERMINEE"});
+        this.comboFiltreMembre = new JComboBox<>();
         this.nomsMembresParId = new HashMap<>();
 
         initialiserInterface();
@@ -134,6 +142,31 @@ public class TachePanel extends JPanel {
         });
         JScrollPane scrollListe = new JScrollPane(listeTaches);
 
+        JPanel panneauFiltres = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
+        panneauFiltres.setBorder(BorderFactory.createTitledBorder("Filtrer les tâches"));
+        panneauFiltres.add(new JLabel("Statut :"));
+        panneauFiltres.add(comboFiltreStatut);
+        panneauFiltres.add(new JLabel("Membre :"));
+        comboFiltreMembre.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value == null) {
+                    setText("Tous les membres");
+                }
+                return this;
+            }
+        });
+        panneauFiltres.add(comboFiltreMembre);
+        JButton boutonFiltrer = new JButton("Filtrer");
+        boutonFiltrer.addActionListener(e -> chargerTaches());
+        panneauFiltres.add(boutonFiltrer);
+
+        JPanel panneauCentre = new JPanel(new BorderLayout(4, 4));
+        panneauCentre.add(panneauFiltres, BorderLayout.NORTH);
+        panneauCentre.add(scrollListe, BorderLayout.CENTER);
+        panneauCentre.add(etiquetteMessageListe, BorderLayout.SOUTH);
+
         JPanel panneauActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         panneauActions.setBorder(BorderFactory.createTitledBorder("Actions sur la tâche sélectionnée"));
         panneauActions.add(new JLabel("Membre :"));
@@ -149,7 +182,7 @@ public class TachePanel extends JPanel {
         panneauActions.add(boutonStatut);
 
         add(panneauFormulaire, BorderLayout.NORTH);
-        add(scrollListe, BorderLayout.CENTER);
+        add(panneauCentre, BorderLayout.CENTER);
         add(panneauActions, BorderLayout.SOUTH);
     }
 
@@ -162,6 +195,7 @@ public class TachePanel extends JPanel {
         this.projetSelectionne = projet;
         if (projet == null) {
             etiquetteProjetSelectionne.setText("Aucun projet sélectionné");
+            etiquetteMessageListe.setText(" ");
             modeleListeTaches.clear();
             return;
         }
@@ -172,10 +206,13 @@ public class TachePanel extends JPanel {
     private void chargerMembres() {
         try {
             comboMembres.removeAllItems();
+            comboFiltreMembre.removeAllItems();
+            comboFiltreMembre.addItem(null);
             nomsMembresParId.clear();
             List<Utilisateur> membres = tacheService.listerMembres();
             for (Utilisateur membre : membres) {
                 comboMembres.addItem(membre);
+                comboFiltreMembre.addItem(membre);
                 nomsMembresParId.put(membre.getId(), membre.getNom());
             }
         } catch (PersistanceException ex) {
@@ -281,13 +318,28 @@ public class TachePanel extends JPanel {
     private void chargerTaches() {
         if (projetSelectionne == null) {
             modeleListeTaches.clear();
+            etiquetteMessageListe.setText(" ");
             return;
         }
+        String choixStatut = (String) comboFiltreStatut.getSelectedItem();
+        String statutFiltre = (choixStatut == null || OPTION_TOUS_STATUTS.equals(choixStatut)) ? null : choixStatut;
+        Utilisateur membreFiltre = (Utilisateur) comboFiltreMembre.getSelectedItem();
+        Integer utilisateurIdFiltre = (membreFiltre == null) ? null : membreFiltre.getId();
+
         try {
             modeleListeTaches.clear();
-            List<Tache> taches = tacheService.listerTachesDuProjet(projetSelectionne.getId());
+            List<Tache> taches = tacheService.filtrerTachesDuProjet(
+                    projetSelectionne.getId(),
+                    statutFiltre,
+                    utilisateurIdFiltre
+            );
             for (Tache tache : taches) {
                 modeleListeTaches.addElement(tache);
+            }
+            if (taches.isEmpty()) {
+                etiquetteMessageListe.setText("Aucune tâche ne correspond au filtre sélectionné.");
+            } else {
+                etiquetteMessageListe.setText(" ");
             }
         } catch (IllegalArgumentException | PersistanceException ex) {
             JOptionPane.showMessageDialog(

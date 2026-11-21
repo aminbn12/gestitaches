@@ -131,6 +131,48 @@ public class TacheDAO {
         }
     }
 
+    /**
+     * Retourne les tâches d'un projet filtrées optionnellement par statut et/ou par membre.
+     *
+     * @param projetId identifiant du projet
+     * @param statut statut recherché, ou {@code null} pour ne pas filtrer par statut
+     * @param utilisateurId identifiant du membre, ou {@code null} pour ne pas filtrer par membre
+     * @return liste des tâches correspondantes
+     */
+    public List<Tache> listerParProjetEtFiltres(int projetId, String statut, Integer utilisateurId) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT id, titre, description, statut, echeance, projet_id, utilisateur_id FROM tache WHERE projet_id = ?"
+        );
+        if (statut != null) {
+            sql.append(" AND statut = ?");
+        }
+        if (utilisateurId != null) {
+            sql.append(" AND utilisateur_id = ?");
+        }
+        sql.append(" ORDER BY id");
+
+        List<Tache> taches = new ArrayList<>();
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement requete = connexion.prepareStatement(sql.toString())) {
+            int index = 1;
+            requete.setInt(index++, projetId);
+            if (statut != null) {
+                requete.setString(index++, statut);
+            }
+            if (utilisateurId != null) {
+                requete.setInt(index, utilisateurId);
+            }
+            try (ResultSet resultats = requete.executeQuery()) {
+                while (resultats.next()) {
+                    taches.add(construireTache(resultats));
+                }
+            }
+            return taches;
+        } catch (SQLException e) {
+            throw new PersistanceException("Impossible de filtrer les tâches du projet.", e);
+        }
+    }
+
     private Tache construireTache(ResultSet resultats) throws SQLException {
         int idUtilisateur = resultats.getInt("utilisateur_id");
         Integer utilisateurId = resultats.wasNull() ? null : idUtilisateur;
