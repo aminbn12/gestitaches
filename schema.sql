@@ -16,7 +16,7 @@ CREATE TABLE tache (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   titre TEXT NOT NULL,
   description TEXT,
-  statut TEXT NOT NULL DEFAULT 'à faire' CHECK (statut IN ('à faire', 'en cours', 'terminée')),
+  statut TEXT NOT NULL DEFAULT 'A_FAIRE' CHECK (statut IN ('A_FAIRE', 'EN_COURS', 'TERMINEE')),
   echeance TEXT,
   projet_id INTEGER NOT NULL REFERENCES projet(id),
   utilisateur_id INTEGER REFERENCES utilisateur(id)

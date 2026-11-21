@@ -11,25 +11,25 @@
 
 ## Pile technique
 
-- <langage et version>
-- <interface graphique>
-- <base de données et mode d'accès>
-- <outil de build>
+- langage et version
+- interface graphique
+- base de données et mode d'accès
+- outil de build
 
 ## Conventions
 
-- <organisation des packages>
-- <règles de nommage>
+- organisation des packages
+- règles de nommage
 
 ## Règles à toujours respecter
 
-- <règle de sécurité sur les requêtes SQL>
-- <règle sur les mots de passe et les clés>
+- règle de sécurité sur les requêtes SQL
+- règle sur les mots de passe et les clés
 
 ## Façon de travailler
 
-- <ce que l'assistant doit faire avant de modifier des fichiers>
-- <taille d'une tâche : combien de user stories à la fois ?>
+- ce que l'assistant doit faire avant de modifier des fichiers
+- taille d'une tâche : combien de user stories à la fois ?
 
 ## Documents de référence
 
