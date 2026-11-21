@@ -60,22 +60,70 @@ public class TacheDAO {
             requete.setInt(1, projetId);
             try (ResultSet resultats = requete.executeQuery()) {
                 while (resultats.next()) {
-                    int idUtilisateur = resultats.getInt("utilisateur_id");
-                    Integer utilisateurId = resultats.wasNull() ? null : idUtilisateur;
-                    taches.add(new Tache(
-                            resultats.getInt("id"),
-                            resultats.getString("titre"),
-                            resultats.getString("description"),
-                            resultats.getString("statut"),
-                            resultats.getString("echeance"),
-                            resultats.getInt("projet_id"),
-                            utilisateurId
-                    ));
+                    taches.add(construireTache(resultats));
                 }
             }
             return taches;
         } catch (SQLException e) {
             throw new PersistanceException("Impossible de lister les tâches du projet.", e);
         }
+    }
+
+    /**
+     * Recherche une tâche par son identifiant.
+     *
+     * @param tacheId identifiant de la tâche
+     * @return la tâche correspondante, ou {@code null} si introuvable
+     */
+    public Tache trouverParId(int tacheId) {
+        String sql = "SELECT id, titre, description, statut, echeance, projet_id, utilisateur_id FROM tache WHERE id = ?";
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement requete = connexion.prepareStatement(sql)) {
+            requete.setInt(1, tacheId);
+            try (ResultSet resultats = requete.executeQuery()) {
+                if (resultats.next()) {
+                    return construireTache(resultats);
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new PersistanceException("Impossible de rechercher la tâche.", e);
+        }
+    }
+
+    /**
+     * Met à jour le membre attribué à une tâche (ou retire l'attribution si {@code null}).
+     *
+     * @param tacheId identifiant de la tâche
+     * @param utilisateurId identifiant du membre, ou {@code null}
+     */
+    public void assignerUtilisateur(int tacheId, Integer utilisateurId) {
+        String sql = "UPDATE tache SET utilisateur_id = ? WHERE id = ?";
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement requete = connexion.prepareStatement(sql)) {
+            if (utilisateurId == null) {
+                requete.setNull(1, Types.INTEGER);
+            } else {
+                requete.setInt(1, utilisateurId);
+            }
+            requete.setInt(2, tacheId);
+            requete.executeUpdate();
+        } catch (SQLException e) {
+            throw new PersistanceException("Impossible d'assigner la tâche.", e);
+        }
+    }
+
+    private Tache construireTache(ResultSet resultats) throws SQLException {
+        int idUtilisateur = resultats.getInt("utilisateur_id");
+        Integer utilisateurId = resultats.wasNull() ? null : idUtilisateur;
+        return new Tache(
+                resultats.getInt("id"),
+                resultats.getString("titre"),
+                resultats.getString("description"),
+                resultats.getString("statut"),
+                resultats.getString("echeance"),
+                resultats.getInt("projet_id"),
+                utilisateurId
+        );
     }
 }

@@ -1,7 +1,9 @@
 package fr.usms.gestitaches.service;
 
 import fr.usms.gestitaches.dao.TacheDAO;
+import fr.usms.gestitaches.dao.UtilisateurDAO;
 import fr.usms.gestitaches.model.Tache;
+import fr.usms.gestitaches.model.Utilisateur;
 
 import java.util.List;
 
@@ -13,13 +15,15 @@ public class TacheService {
     private static final String STATUT_INITIAL = "A_FAIRE";
 
     private final TacheDAO tacheDAO;
+    private final UtilisateurDAO utilisateurDAO;
 
     public TacheService() {
-        this(new TacheDAO());
+        this(new TacheDAO(), new UtilisateurDAO());
     }
 
-    public TacheService(TacheDAO tacheDAO) {
+    public TacheService(TacheDAO tacheDAO, UtilisateurDAO utilisateurDAO) {
         this.tacheDAO = tacheDAO;
+        this.utilisateurDAO = utilisateurDAO;
     }
 
     /**
@@ -56,6 +60,31 @@ public class TacheService {
             throw new IllegalArgumentException("Veuillez sélectionner un projet valide.");
         }
         return tacheDAO.listerParProjet(projetId);
+    }
+
+    /**
+     * Retourne la liste des membres de l'équipe.
+     *
+     * @return liste des utilisateurs
+     */
+    public List<Utilisateur> listerMembres() {
+        return utilisateurDAO.listerTout();
+    }
+
+    /**
+     * Attribue une tâche à un unique membre de l'équipe (ou la rend non assignée si {@code null}).
+     *
+     * @param tacheId identifiant de la tâche
+     * @param utilisateurId identifiant du membre, ou {@code null}
+     */
+    public void assignerTache(int tacheId, Integer utilisateurId) {
+        if (tacheId <= 0 || tacheDAO.trouverParId(tacheId) == null) {
+            throw new IllegalArgumentException("La tâche sélectionnée n'existe pas.");
+        }
+        if (utilisateurId != null && utilisateurDAO.trouverParId(utilisateurId) == null) {
+            throw new IllegalArgumentException("Le membre sélectionné n'existe pas.");
+        }
+        tacheDAO.assignerUtilisateur(tacheId, utilisateurId);
     }
 
     private String normaliserChampFacultatif(String valeur) {

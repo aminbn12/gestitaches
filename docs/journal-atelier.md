@@ -32,10 +32,25 @@
 - **Fichiers autorisés (Étape 4)** : `model/Tache.java`, `dao/TacheDAO.java`, `service/TacheService.java`, `ui/TachePanel.java`, `ui/MainFrame.java`, `App.java`.
 - **Analyse du diff (`--stat`) (Étape 6)** : 6 fichiers Java dans le périmètre autorisé + `docs/journal-atelier.md`. Couches respectées (`java.sql` uniquement dans `dao`, `javax.swing` uniquement dans `ui`), `PreparedStatement`, `try-with-resources`, `PersistanceException`, aucune fonctionnalité en trop.
 - **Décision / consigne de correction (Étape 7)** : Proposition acceptée sans correction.
-- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels en attente de validation.
-- **Commit (Étape 9)** : à compléter après tests et commit
+- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels validés (création avec/sans description et échéance, refus si titre vide ou sans projet, vérification en base).
+- **Commit (Étape 9)** : `US2 : créer une tâche dans un projet`
 
 ## User story 3 — Assigner une tâche à un membre
+
+- **Scénarios d'acceptation (Étape 2)** :
+
+| Scénario | Étant donné / Quand | Alors (résultat attendu) |
+| :--- | :--- | :--- |
+| Cas nominal (assignation) | Une tâche existe et la liste des membres (`donnees-test.sql`) est chargée ; je sélectionne la tâche, choisis un membre et clique sur « Assigner » | La tâche est mise à jour en base (`utilisateur_id` renseigné) et le nom du membre s'affiche sur la tâche |
+| Cas nominal (réassignation) | Une tâche déjà assignée à un membre ; je choisis un autre membre et clique sur « Assigner » | La tâche passe uniquement au nouveau membre |
+| Cas limite : membre inexistant ou aucune tâche sélectionnée | Aucune tâche sélectionnée (ou membre inexistant en service) | L'opération est refusée et un message d'erreur s'affiche |
+
+- **Verdict sur le plan (Étape 3)** : Plan validé (couches `model`, `dao`, `service`, `ui` respectées, US3 uniquement).
+- **Fichiers autorisés (Étape 4)** : `model/Utilisateur.java`, `dao/UtilisateurDAO.java`, `dao/TacheDAO.java`, `service/TacheService.java`, `ui/TachePanel.java`.
+- **Analyse du diff (`--stat`) (Étape 6)** : 5 fichiers Java dans le périmètre autorisé + `docs/journal-atelier.md`. Couches respectées (`java.sql` uniquement dans `dao`, `javax.swing` uniquement dans `ui`), `PreparedStatement`, `try-with-resources`, `PersistanceException`, aucune fonctionnalité en trop.
+- **Décision / consigne de correction (Étape 7)** : Proposition acceptée sans correction.
+- **Résultats des contrôles (Étape 8)** : `mvn -q compile` OK ; tests manuels en attente de validation.
+- **Commit (Étape 9)** : à compléter après tests et commit
 
 ## User story 4 — Changer le statut d'une tâche
 
